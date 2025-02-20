@@ -1,3 +1,4 @@
+using NUnit.Framework.Constraints;
 using System;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ public class playground : MonoBehaviour
 
     private void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();        
+        spriteRenderer = GetComponent<SpriteRenderer>(); 
     }
 
     private void Start()
@@ -47,5 +48,19 @@ public class playground : MonoBehaviour
 
         sprite = Sprite.Create(myTexture, new Rect(0f, 0f, myTexture.width, myTexture.height), pivot, 1f);
         spriteRenderer.sprite = sprite;
+    }
+
+    public Vector2Int GetSpriteArea()
+    {
+        return new Vector2Int(xSize, ySize);
+    }
+
+    public void DrawForGui()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        myTexture = new Texture2D(xSize, ySize);
+
+        FillColor();
     }
 }
