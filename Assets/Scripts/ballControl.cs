@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using System.Collections;
 
 public class BallControl : MonoBehaviour
@@ -15,9 +15,6 @@ public class BallControl : MonoBehaviour
     [SerializeField] private int _maxBounces;
     private int _currentBounces;
     private bool isMoving = false;
-
-    public UnityEvent<float> speedForceChange;
-    public UnityEvent ballReleased;
 
     private int CurrentBounces
     {
@@ -57,10 +54,7 @@ public class BallControl : MonoBehaviour
     private void HandlePowerCharge()
     {
         if (Input.GetKey(KeyCode.Space))
-        {
             speedForce += speedForceRatio * Time.deltaTime;
-            speedForceChange.Invoke(speedForce);
-        }
     }
 
     private void HandleMovement()
@@ -85,8 +79,6 @@ public class BallControl : MonoBehaviour
 
         float rot = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, rot);
-        
-        ballReleased.Invoke();
     }
 
     private void SmoothStop()
@@ -123,10 +115,5 @@ public class BallControl : MonoBehaviour
     {
         pointer.transform.position = transform.position + Vector3.up * pointerGap;
         pointer.rotation = Quaternion.identity;
-    }
-
-    public float GetMaxSpeed()
-    {
-        return maxSpeed;
     }
 }
