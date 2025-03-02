@@ -12,12 +12,24 @@ public class BallControl : MonoBehaviour
     float speedForce;
 
     private Rigidbody2D rb;
-    [SerializeField] private int _maxBounces;
     private int _currentBounces;
+
     private bool isMoving = false;
+    bool _IsMoving
+    {
+        get { return isMoving; }
+        set
+        {
+            _IsMoving = value;
+            ballBounced.Invoke(CurrentBounces);
+            CurrentBounces = 0;
+        }
+    }
+
 
     public UnityEvent<float> speedForceChange;
     public UnityEvent ballReleased;
+    public UnityEvent<int> ballBounced;
 
     private int CurrentBounces
     {
@@ -25,18 +37,14 @@ public class BallControl : MonoBehaviour
         set
         {
             _currentBounces = value;
-            if (_currentBounces <= 0)
-            {
-                SmoothStop();
-                _currentBounces = _maxBounces;
-            }
         }
     }
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        CurrentBounces = _maxBounces;
+        CurrentBounces = 0;
+        _IsMoving = isMoving;
     }
 
     private void Update()
@@ -44,6 +52,12 @@ public class BallControl : MonoBehaviour
         HandleRotation();
         HandlePowerCharge();
         HandleMovement();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        CurrentBounces++;
+        ballBounced.Invoke(CurrentBounces);
     }
 
     private void HandleRotation()
@@ -70,7 +84,7 @@ public class BallControl : MonoBehaviour
             LaunchBall();
         }
 
-        if (isMoving && rb.linearVelocity.magnitude < speedThreshold)
+        if (_IsMoving && rb.linearVelocity.magnitude < speedThreshold)
         {
             SmoothStop();
         }
@@ -78,7 +92,7 @@ public class BallControl : MonoBehaviour
 
     private void LaunchBall()
     {
-        isMoving = true;
+        _IsMoving = true;
         speedForce = Mathf.Clamp(speedForce, 0f, maxSpeed);
         Vector3 direction = (pointer.transform.position - transform.position).normalized;
         rb.linearVelocity = direction * speedForce;
@@ -114,9 +128,15 @@ public class BallControl : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
-        isMoving = false;
+        _IsMoving = false;
         speedForce = 0f;
         ResetPointer();
+    }
+
+    public bool IsMoving()
+    {
+        Debug.Log(_IsMoving);
+        return _IsMoving;
     }
 
     private void ResetPointer()
