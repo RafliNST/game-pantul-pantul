@@ -105,6 +105,9 @@ MonoBehaviour:
   validatePositionTime: 5
   _player: {fileID: 0}
   _playground: {fileID: 0}
+  goalReached:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!58 &3822335665710463898
 CircleCollider2D:
   m_ObjectHideFlags: 0

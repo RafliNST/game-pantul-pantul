@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 
 public class Goal : MonoBehaviour
@@ -9,6 +10,8 @@ public class Goal : MonoBehaviour
     
     Collider2D _collider;
     Vector2Int playGroundBounds;
+
+    public UnityEvent goalReached;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -24,7 +27,6 @@ public class Goal : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         StartCoroutine(ValidatePosition(validatePositionTime));
-
     }
 
     public void ChangePosition()
@@ -41,7 +43,7 @@ public class Goal : MonoBehaviour
 
         if (_collider.bounds.Contains(_player.position))
         {
-            //_animator.Play("goal-shrink");
+            goalReached.Invoke();
             ChangePosition();
         }
     }    

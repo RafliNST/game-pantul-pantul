@@ -15,17 +15,6 @@ public class BallControl : MonoBehaviour
     private int _currentBounces;
 
     private bool isMoving = false;
-    bool _IsMoving
-    {
-        get { return isMoving; }
-        set
-        {
-            _IsMoving = value;
-            ballBounced.Invoke(CurrentBounces);
-            CurrentBounces = 0;
-        }
-    }
-
 
     public UnityEvent<float> speedForceChange;
     public UnityEvent ballReleased;
@@ -36,7 +25,11 @@ public class BallControl : MonoBehaviour
         get { return _currentBounces; }
         set
         {
-            _currentBounces = value;
+            if (_currentBounces != value)
+            {
+                _currentBounces = value;
+                ballBounced.Invoke(CurrentBounces);
+            }
         }
     }
 
@@ -44,7 +37,6 @@ public class BallControl : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         CurrentBounces = 0;
-        _IsMoving = isMoving;
     }
 
     private void Update()
@@ -57,7 +49,6 @@ public class BallControl : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         CurrentBounces++;
-        ballBounced.Invoke(CurrentBounces);
     }
 
     private void HandleRotation()
@@ -84,7 +75,7 @@ public class BallControl : MonoBehaviour
             LaunchBall();
         }
 
-        if (_IsMoving && rb.linearVelocity.magnitude < speedThreshold)
+        if (isMoving && rb.linearVelocity.magnitude < speedThreshold)
         {
             SmoothStop();
         }
@@ -92,7 +83,7 @@ public class BallControl : MonoBehaviour
 
     private void LaunchBall()
     {
-        _IsMoving = true;
+        isMoving = true;
         speedForce = Mathf.Clamp(speedForce, 0f, maxSpeed);
         Vector3 direction = (pointer.transform.position - transform.position).normalized;
         rb.linearVelocity = direction * speedForce;
@@ -128,15 +119,11 @@ public class BallControl : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
-        _IsMoving = false;
+        isMoving = false;
         speedForce = 0f;
-        ResetPointer();
-    }
 
-    public bool IsMoving()
-    {
-        Debug.Log(_IsMoving);
-        return _IsMoving;
+        CurrentBounces = 0;
+        ResetPointer();
     }
 
     private void ResetPointer()
